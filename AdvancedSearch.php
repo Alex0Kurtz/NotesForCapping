@@ -1,3 +1,5 @@
+AEAWEAWE
+
 <?php 
 $title = "Advanced Search";
 include( 'includes/header.php' ); ?>
