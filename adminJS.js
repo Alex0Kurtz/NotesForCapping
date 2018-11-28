@@ -1,5 +1,5 @@
 //script to create course selection dropdown 
-
+AWEAWE
 var jsonURL = 'https://comas-api.ecrl.marist.edu/userrank/'; // change this to the table to get
 var fetchObj = [];  //will house the converted json object
 var fetchArr = [];  //will hold the x-dimensional array of pertinent information only
