@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <title>Professor Home Page</title>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+ <link rel="stylesheet" href="../css/profile.css">
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+ <link rel="stylesheet" type = "text/css" href="/css/custom.css">
+</head>
+<body style="background-color: #37393f">
+  <div data-include = "nav-bar-user"></div>
+<div class="container">
+ <!-- Nav tabs -->
+ <ul class="nav nav-tabs" role="tablist">
+   <li class="nav-item">
+     <a class="nav-link active" data-toggle="tab" href="#home"><%= user.userFirstName%>'s Info</a>
+   </li>
+   <li class="nav-item">
+     <a class="nav-link" data-toggle="tab" href="#menu1">Update Information</a>
+   </li>
+ </ul>
+ <!-- Tab panes -->
+ <div class="tab-content" id = "tabbed">
+
+   <div id="home" class="container tab-pane active"><br>
+       <table id ="UsersTable"; class = "col-md-14 table table-hover"; style= "background-color: #404040">
+           <tr>
+               <th>ID</th>
+               <th>Email</th>
+               <th>First Name</th>
+               <th>Last Name</th>
+               <th>Credit Required</th>
+               <th>Year Started</th>
+             </tr>
+       <tr>
+           <td><%= user.userId%></td>
+           <td><%= user.userEmail%></td>
+           <td><%= user.userFirstName%></td>
+           <td><%= user.userLastName%></td>
+           <td><%= user.userCreditReq%></td>
+           <td><%= user.userYearStarted%></td>
+       </tr>
+       </table>
+</table>
+   </div>
+   <div id="menu1" class="container tab-pane fade">
+       <form class="form" id="updatePassword">
+       <div class="updatemessage" id="updatePasswordMessage"></div>
+           <h5>Enter Old Password:</h5>
+           <div class="updatemessage" id="updatePasswordMessage"></div>
+           <input type="password" class="form-control" name="password" id="old_password" placeholder="Enter Old Password">
+           <br><h5>Enter New Password:</h5>
+           <input type="password" class="form-control" name="new_password" id="new_password" placeholder="Enter New Password">
+           <br><h5>Verify New Password:</h5>
+           <input type="password" class="form-control" name="verify_password" id="verify_newpassword" placeholder="Verify New Password">
+           <br>
+           <button id="updatePasswordButton" class="btn btn-lg btn-success" type="button" > Update </button>
+       </form>
+</div>
+</div>
+</div>
+</div>
+<div data-include = "footer"></div>
+</body>
+</html>
+<script src = "/js/custom.js"></script>
+<script>
+ 
+ $('#updatePasswordButton').on('click', (e) => {
+     e.preventDefault();
+     resetMessages('#updateEmailButton');
+     let oldPassword, newPassword, verifyPassword;
+     [oldPassword, newPassword, verifyPassword] = [$('#old_password').val(), $('#new_password').val(), $('#verify_newpassword').val()];
+    const Email = '<%= user.userEmail%>'
+     // TODO: move to a validate function and return 1 flag along with email verify
+     if(!oldPassword || !newPassword || !verifyPassword) {
+         updateError(null,'Incomplete form!', '#updatePasswordMessage');
+         return
+     }
+     fetch(`https://comas-api.ecrl.marist.edu/authenticate/`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                userEmail: Email,
+                userPassword: oldPassword
+            })
+            }).then(res => res.json()).then(resp => {
+              if (resp.msg){
+                updateError(null, 'User Password is Incorrect!', '#updatePasswordMessage');
+              } else {
+                if (newPassword === verifyPassword) {
+                fetch('/change-password', {
+                method: 'POST',
+                headers: {
+                 'Accept': 'application/json',
+                 'Content-Type': 'application/json'
+             },
+                body: JSON.stringify({
+                userPassword: verifyPassword
+             })
+         }).then()
+     } else if(newPassword != verifyPassword){
+         updateError(null, 'passwords Do not Match!', '#updatePasswordMessage');
+     } else {
+      updateError(null, 'Invalid Password!', '#updatePasswordMessage');
+     }
+    }
+  });
+     
+ });
+
+function updateError(err, msg, el) {
+ $(el).html(msg);
+ $(el).addClass('alert alert-danger');
+ console.log(err);
+}
+
+function updateSuccess(msg, el) {
+ $(el).text(msg);
+ // TODO: clear inputs
+ $(el).removeClass('alert alert-danger')
+ $(el).addClass('alert alert-success');
+}
+
+function resetMessages(el) {
+ $(el).text();
+ $(el).removeClass('alert alert-success alert-danger');
+}
+</script>
+   
